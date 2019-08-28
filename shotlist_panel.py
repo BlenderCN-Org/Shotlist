@@ -53,22 +53,13 @@ class ShotlistPanel(bpy.types.Panel):
 		current_selection_column.label(text="New Shot")
 
 		current_selection_grid = current_selection_column.grid_flow(columns=0, even_columns=False, even_rows=False, align=True)
-		### FIX — MESSY ###
+		
 		obj = context.object
-		# If we have an active object
-		if obj:
-			if obj.type == "CAMERA":
-				# Active active label
-				current_selection_grid.box().label(text=obj.name, icon="OUTLINER_OB_CAMERA")
 
-			else:
-				# Active obj label
-				current_selection_grid.box().label(text=obj.name, icon="OBJECT_DATA")
-
-		# If no active object
-		else:
-			# Info
-			current_selection_grid.box().label(text="No Camera Selected", icon="RESTRICT_SELECT_ON")
+		selected_info = obj.name if obj and obj.type == "CAMERA" else "No Camera Selected"
+		selected_icon = "OUTLINER_OB_CAMERA" if obj and obj.type == "CAMERA" else "RESTRICT_SELECT_ON"
+		
+		current_selection_grid.box().label(text=selected_info, icon=selected_icon)
 		
 		# Current Frame Label
 		current_selection_grid.box().label(text=str(scene.frame_current), icon="TIME")
