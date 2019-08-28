@@ -23,7 +23,7 @@ bl_info = {
 	"author": "Hyuri Pimentel",
 	"description": "Set and Manage Camera Shots",
 	"blender": (2, 81, 0),
-	"version": (0, 0, 2),
+	"version": (0, 0, 3),
 	"location": "View3D > Properties > Shotlist",
 	"support": "COMMUNITY",
 	"warning": "",
