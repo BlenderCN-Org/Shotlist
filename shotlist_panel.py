@@ -51,7 +51,7 @@ class ShotlistPanel(bpy.types.Panel):
 		current_selection_column = layout.box().column()
 		# Add New Shot Label
 		current_selection_column.label(text="New Shot")
-		
+
 		current_selection_grid = current_selection_column.grid_flow(columns=0, even_columns=False, even_rows=False, align=True)
 		### FIX — MESSY ###
 		obj = context.object
@@ -86,7 +86,7 @@ class ShotlistPanel(bpy.types.Panel):
 		shots_header.label(text=f"Shots:  {shots_count}", icon="SEQUENCE")
 		# Lock Markers Button
 		lock_icon = "LOCKED" if scene.tool_settings.lock_markers else "UNLOCKED"
-		shots_header.row().prop(context.scene.tool_settings, "lock_markers", icon=lock_icon, icon_only=True, emboss=True)
+		shots_header.row().prop(context.scene.tool_settings, "lock_markers", icon=lock_icon, icon_only=True, emboss=False)
 		
 		# Alternative Left/Right Icons: "BACK"/"FOWARD"
 		navigation_buttons_row = shots_box.row(align=True)
