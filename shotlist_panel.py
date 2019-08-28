@@ -20,7 +20,6 @@ import bpy
 
 from . shotlist_api import (
 	get_shots,
-	higher_frame_shot, lower_frame_shot,
 	is_active_shot,
 )
 from . shotlist_ops import (
