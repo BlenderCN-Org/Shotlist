@@ -47,72 +47,71 @@ class ShotlistPanel(bpy.types.Panel):
 
 		layout = self.layout
 
-		current_selection_column = layout.box().column()
-		# Add New Shot Label
-		current_selection_column.label(text="New Shot")
+		box = layout.box()
+		col = box.column()
 
-		current_selection_grid = current_selection_column.grid_flow(columns=0, even_columns=False, even_rows=False, align=True)
+		# Add New Shot Label
+		col.label(text="New Shot")
+
+		flow = col.grid_flow(columns=0, even_columns=False, even_rows=False, align=True)
 		
 		obj = context.object
-
 		selected_info = obj.name if obj and obj.type == "CAMERA" else "No Camera Selected"
 		selected_icon = "OUTLINER_OB_CAMERA" if obj and obj.type == "CAMERA" else "RESTRICT_SELECT_ON"
 		
-		current_selection_grid.box().label(text=selected_info, icon=selected_icon)
-		
+		# Selected object Label
+		flow.box().label(text=selected_info, icon=selected_icon)
 		# Current Frame Label
-		current_selection_grid.box().label(text=str(scene.frame_current), icon="TIME")
+		flow.box().label(text=str(scene.frame_current), icon="TIME")
+
 		# ShotsAdd Button
-		current_selection_column.operator(ShotsAdd.bl_idname, text="Add Shot", icon="ADD")
+		col.operator(ShotsAdd.bl_idname, text="Add Shot", icon="ADD")
 
 		layout.separator()
 		
-		# shots_box
-		shots_box = layout.box()
+		# Box that encapsulates the whole "shots" section
+		box = layout.box()
+
 		# Shots Header
-		shots_header = shots_box.row(align=True)
-		# Shots Label
+		row = box.row(align=True)
+		# Shots Count Label
 		shots_count = len(get_shots())
-		shots_header.label(text=f"Shots:  {shots_count}", icon="SEQUENCE")
-		# Lock Markers Button
+		row.label(text=f"Shots:  {shots_count}", icon="SEQUENCE")
+		# Lock Markers Toggle Button
 		lock_icon = "LOCKED" if scene.tool_settings.lock_markers else "UNLOCKED"
-		shots_header.row().prop(context.scene.tool_settings, "lock_markers", icon=lock_icon, icon_only=True, emboss=False)
+		row.row().prop(context.scene.tool_settings, "lock_markers", icon=lock_icon, icon_only=True, emboss=False)
 		
-		# Alternative Left/Right Icons: "BACK"/"FOWARD"
-		navigation_buttons_row = shots_box.row(align=True)
-		navigation_buttons_row.operator(ShotsPrevious.bl_idname, text="Previous Shot", icon="SORT_DESC")
-		navigation_buttons_row.operator(ShotsNext.bl_idname, text="Next Shot", icon="SORT_ASC")
+		# Next/Previous Shot Buttons
+		row = box.row(align=True)
+		row.operator(ShotsPrevious.bl_idname, text="Previous Shot", icon="SORT_DESC")
+		row.operator(ShotsNext.bl_idname, text="Next Shot", icon="SORT_ASC")
 		
 		if not get_shots():
 			return
 
-		header_col = shots_box.row().column(align=True)
+		flow = box.row().grid_flow(columns=4, even_columns=False, even_rows=False, align=True)
 
-		header_grid = header_col.grid_flow(columns=4, even_columns=False, even_rows=False, align=True)
-
-		for title in ("START", "SHOT", "CAMERA"):
-			header_grid.row().label(text=str(title))
-		
-		body_col = shots_box.row().column(align=True)
+		for title in ("START", "SHOT", "CAMERA", ""):
+			flow.label(text=str(title))
 
 		sorted_shots = sorted(get_shots(), key=lambda shot: shot.frame)
 		
-		# Redesign this layout. It's a little bit of a mess
+		sub_box = box.box()
 		for shot in sorted_shots:
-			body_grid = body_col.grid_flow(columns=4, even_columns=False, even_rows=False, align=True)
+			flow = sub_box.grid_flow(columns=4, even_columns=True, even_rows=True, align=True)
 			
-			body_grid.box().operator(ShotsGoTo.bl_idname, text=f"{shot.frame}", emboss=True, depress=is_active_shot(shot)).frame = shot.frame
-			body_grid.box().prop(shot, "name", text="")
-			body_grid.box().label(text=shot.camera.name)
-			body_grid.box().operator(ShotsRemoveShot.bl_idname, text="", emboss=False, depress=False, icon="CANCEL").at_frame = shot.frame
+			flow.operator(ShotsGoTo.bl_idname, text=f"{shot.frame}", emboss=True, depress=is_active_shot(shot)).frame = shot.frame
+			flow.prop(shot, "name", text="")
+			flow.label(text=shot.camera.name)
+			flow.operator(ShotsRemoveShot.bl_idname, text="", emboss=False, depress=False, icon="CANCEL").at_frame = shot.frame
 		
 		# Ideal would be to disable only the editable or destructive props, or at least leave the frame button clickable
-		body_col.enabled = False if scene.tool_settings.lock_markers else True
+		sub_box.enabled = False if scene.tool_settings.lock_markers else True
 		
 		layout.separator()
 
 		# ShotsRemoveAll Button
-		remove_all_row = layout.row()
-		remove_all_row.operator(ShotsRemoveAll.bl_idname, text="Remove All Shots", icon="CANCEL")
+		row = layout.row()
+		row.operator(ShotsRemoveAll.bl_idname, text="Remove All Shots", icon="CANCEL")
 
-		remove_all_row.enabled = False if scene.tool_settings.lock_markers else True
+		row.enabled = False if scene.tool_settings.lock_markers else True
