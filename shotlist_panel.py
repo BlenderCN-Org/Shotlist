@@ -20,7 +20,7 @@ import bpy
 
 from . shotlist_api import (
 	get_shots,
-	get_next_shot, get_previous_shot,
+	higher_frame_shot, lower_frame_shot,
 	is_active_shot,
 )
 from . shotlist_ops import (
@@ -44,22 +44,17 @@ class ShotlistPanel(bpy.types.Panel):
 		return context.mode == "OBJECT"
 
 	def draw(self, context):
-		# Get active Scene
 		scene = context.scene
-		# Get active object
-		obj = context.object
 
 		layout = self.layout
 
 		current_selection_column = layout.box().column()
-
 		# Add New Shot Label
 		current_selection_column.label(text="New Shot")
-
+		
 		current_selection_grid = current_selection_column.grid_flow(columns=0, even_columns=False, even_rows=False, align=True)
-
-		# current_selection_grid.box().operator(ShotsGoTo.bl_idname, text=f"{str(shot.frame)}").frame = shot.frame
-		### FIX ###
+		### FIX — MESSY ###
+		obj = context.object
 		# If we have an active object
 		if obj:
 			if obj.type == "CAMERA":
@@ -77,54 +72,46 @@ class ShotlistPanel(bpy.types.Panel):
 		
 		# Current Frame Label
 		current_selection_grid.box().label(text=str(scene.frame_current), icon="TIME")
-		# shots_add_row.props(props, "new_shot_name", icon="TIME", icon_only=False, emboss=False)
 		# ShotsAdd Button
 		current_selection_column.operator(ShotsAdd.bl_idname, text="Add Shot", icon="ADD")
 
 		layout.separator()
 		
-		# shots_row
-		shots_row = layout.box()
+		# shots_box
+		shots_box = layout.box()
 		# Shots Header
-		shots_header = shots_row.row(align=True)
+		shots_header = shots_box.row(align=True)
 		# Shots Label
 		shots_count = len(get_shots())
 		shots_header.label(text=f"Shots:  {shots_count}", icon="SEQUENCE")
-		# Lock Markers
+		# Lock Markers Button
 		lock_icon = "LOCKED" if scene.tool_settings.lock_markers else "UNLOCKED"
 		shots_header.row().prop(context.scene.tool_settings, "lock_markers", icon=lock_icon, icon_only=True, emboss=True)
 		
 		# Alternative Left/Right Icons: "BACK"/"FOWARD"
-		navigation_buttons_row = shots_row.row(align=True)
+		navigation_buttons_row = shots_box.row(align=True)
 		navigation_buttons_row.operator(ShotsPrevious.bl_idname, text="Previous Shot", icon="SORT_DESC")
 		navigation_buttons_row.operator(ShotsNext.bl_idname, text="Next Shot", icon="SORT_ASC")
-
-		# Props
-		# props = scene.shot_props
-		# SearchBar
-		# shots_row.row().prop(props, "search_bar", text="Search", icon="VIEWZOOM")
 		
 		if not get_shots():
 			return
 
-		header_row = shots_row.row().column(align=True)
+		header_row = shots_box.row().column(align=True)
 
 		header_grid = header_row.grid_flow(columns=4, even_columns=True, even_rows=False, align=True)
 
-		# for title in ("START", "SHOT", "FRAMING", "CAMERA"):
 		for title in ("START", "SHOT", "CAMERA"):
 			header_grid.row().label(text=str(title))
 		
-		body_row = shots_row.row().column(align=True)
+		body_row = shots_box.row().column(align=True)
 
 		sorted_shots = sorted(get_shots(), key=lambda shot: shot.frame)
-		
+
 		for shot in sorted_shots:
 			body_grid = body_row.grid_flow(columns=4, even_columns=False, even_rows=False, align=True)
 			
 			body_grid.box().operator(ShotsGoTo.bl_idname, text=f"{shot.frame}", emboss=True, depress=is_active_shot(shot)).frame = shot.frame
 			body_grid.box().prop(shot, "name", text="")
-			# body_grid.box().prop(shot, "framing", text="")
 			body_grid.box().label(text=shot.camera.name)
 		
 		# Ideal would be to disable only the editable or destructive props, or at least leave the frame button clickable

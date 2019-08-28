@@ -19,7 +19,7 @@ import bpy
 from . import shotlist_api
 
 
-# Shot Remove Operator
+# Remove All Shots Operator
 class ShotsRemoveAll(bpy.types.Operator):
 	bl_idname = "shotlist.remove_all_shots"
 	bl_label = "Remove All Shots"

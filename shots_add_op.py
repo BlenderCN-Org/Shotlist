@@ -26,10 +26,6 @@ class ShotsAdd(bpy.types.Operator):
 	bl_description = "Add new shot for the active Camera, at current frame"
 	bl_options = {"UNDO"}
 
-	# shot_name: bpy.props.StringProperty(
-		# default=str(len(bpy.context.scene.timeline_markers)),
-	# )
-
 	@classmethod
 	def poll(cls, context):
 		return context.object.type == "CAMERA"

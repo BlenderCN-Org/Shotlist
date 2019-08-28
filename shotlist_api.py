@@ -19,6 +19,9 @@ from functools import reduce
 import bpy
 
 
+# ----------------------------------------------------------------------------
+# Getters
+
 def get_shots():
 	"""
 	Get all shots available.
@@ -27,6 +30,49 @@ def get_shots():
 	scene = bpy.context.scene
 	return list(filter(lambda marker: marker.camera, scene.timeline_markers))
 
+
+def higher_frame_shot(a, b):
+	frame_current = bpy.context.scene.frame_current
+
+	if a.frame > b.frame:
+		if a.frame > frame_current:
+			return a
+		elif b.frame > frame_current:
+			return b
+		return a
+	
+	else:
+		if a.frame > frame_current:
+			return a
+		elif b.frame > frame_current:
+			return b
+		return a
+	
+	return a
+
+
+def lower_frame_shot(a, b):
+	frame_current = bpy.context.scene.frame_current
+
+	if a.frame < b.frame:
+		if a.frame < frame_current:
+			return a
+		elif b.frame < frame_current:
+			return b
+		return a
+	
+	else:
+		if a.frame < frame_current:
+			return a
+		elif b.frame < frame_current:
+			return b
+		return a
+		
+	return a
+
+
+# ----------------------------------------------------------------------------
+# Add/Remove
 
 def add_shot():
 	"""
@@ -47,6 +93,7 @@ def add_shot():
 	shot.camera = context.object
 	# shot.framing = 'MS'
 	
+	# For ignore/replace functionality (to be implemented)
 	# matching_frame = list(filter(lambda shot: shot.frame == bpy.context.scene.frame_current, shots))
 
 	# if any(matching_frame):
@@ -66,47 +113,8 @@ def remove_all():
 			bpy.context.scene.timeline_markers.remove(marker)
 
 
-# Shot Selection
-
-def get_next_shot(a, b):
-	frame_current = bpy.context.scene.frame_current
-
-	if a.frame > b.frame:
-		if a.frame > frame_current:
-			return a
-		elif b.frame > frame_current:
-			return b
-		return a
-	
-	else:
-		if a.frame > frame_current:
-			return a
-		elif b.frame > frame_current:
-			return b
-		return a
-	
-	return a
-
-
-def get_previous_shot(a, b):
-	frame_current = bpy.context.scene.frame_current
-
-	if a.frame < b.frame:
-		if a.frame < frame_current:
-			return a
-		elif b.frame < frame_current:
-			return b
-		return a
-	
-	else:
-		if a.frame < frame_current:
-			return a
-		elif b.frame < frame_current:
-			return b
-		return a
-		
-	return a
-
+# ----------------------------------------------------------------------------
+# Checkers
 
 def is_active_shot(shot):
 	scene = bpy.context.scene
@@ -121,34 +129,13 @@ def is_active_shot(shot):
 		return shot.frame == scene.frame_current
 	
 	# Check if the shot to the left of the playhead is the active shot
-	previous_shot = reduce(get_previous_shot, sorted(sorted_shots, key=lambda shot: shot.frame, reverse=True))
+	previous_shot = reduce(lower_frame_shot, sorted(sorted_shots, key=lambda shot: shot.frame, reverse=True))
 	if shot == previous_shot and previous_shot.frame < scene.frame_current:
 		return True
 	
 	# Check if the shot to the right of the playhead is the active shot
-	next_shot = reduce(get_next_shot, sorted(sorted_shots, key=lambda shot: shot.frame))
+	next_shot = reduce(higher_frame_shot, sorted(sorted_shots, key=lambda shot: shot.frame))
 	if shot == next_shot and previous_shot.frame > scene.frame_current:
 		return True
 	
 	return False
-
-
-# (!) Investigate why this is NOT WORKING
-# def get_active_shot():
-# 	scene = bpy.context.scene
-
-# 	markers = scene.timeline_markers
-# 	shots = list(filter(lambda marker: marker.camera, markers))
-	
-# 	for shot in shots:
-# 		if shot.frame == scene.frame_current:
-# 			return shot
-		
-# 		previous_shot = reduce(get_previous_shot, sorted(shots, key=lambda shot: shot.frame, reverse=True))
-		
-# 		if not previous_shot:
-# 			next_shot = reduce(get_next_shot, sorted(shots, key=lambda shot: shot.frame))
-
-# 			return next_shot
-
-# 		return previous_shot

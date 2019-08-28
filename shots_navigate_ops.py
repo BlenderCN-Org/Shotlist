@@ -20,7 +20,7 @@ import bpy
 
 from . shotlist_api import (
 	get_shots,
-	get_next_shot, get_previous_shot,
+	higher_frame_shot, lower_frame_shot,
 	is_active_shot,
 )
 
@@ -38,7 +38,7 @@ class ShotsNext(bpy.types.Operator):
 	
 	def execute(self, context):
 		shots = get_shots()
-		next_shot = reduce(get_next_shot, sorted(shots, key=lambda shot: shot.frame))
+		next_shot = reduce(higher_frame_shot, sorted(shots, key=lambda shot: shot.frame))
 		
 		context.scene.frame_current = next_shot.frame
 		
@@ -59,7 +59,7 @@ class ShotsPrevious(bpy.types.Operator):
 	def execute(self, context):
 		shots = get_shots()
 		
-		previous_shot = reduce(get_previous_shot, sorted(shots, key=lambda shot: shot.frame, reverse=True))
+		previous_shot = reduce(lower_frame_shot, sorted(shots, key=lambda shot: shot.frame, reverse=True))
 		
 		context.scene.frame_current = previous_shot.frame
 		
