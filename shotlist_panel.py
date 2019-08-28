@@ -104,7 +104,7 @@ class ShotlistPanel(bpy.types.Panel):
 			body_grid.box().operator(ShotsGoTo.bl_idname, text=f"{shot.frame}", emboss=True, depress=is_active_shot(shot)).frame = shot.frame
 			body_grid.box().prop(shot, "name", text="")
 			body_grid.box().label(text=shot.camera.name)
-			body_grid.box().operator(ShotsRemoveShot.bl_idname, text="", emboss=False, depress=False, icon="X").at_frame = shot.frame
+			body_grid.box().operator(ShotsRemoveShot.bl_idname, text="", emboss=False, depress=False, icon="CANCEL").at_frame = shot.frame
 		
 		# Ideal would be to disable only the editable or destructive props, or at least leave the frame button clickable
 		body_col.enabled = False if scene.tool_settings.lock_markers else True
