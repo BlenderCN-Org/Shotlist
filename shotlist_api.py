@@ -31,44 +31,39 @@ def get_shots():
 	return list(filter(lambda marker: marker.camera, scene.timeline_markers))
 
 
-def higher_frame_shot(a, b):
-	frame_current = bpy.context.scene.frame_current
+def get_next_shot(reference_frame, wrap_around=False):
+	next_shot = get_adjecent_shot(reference_frame, "after", wrap_around)
 
-	if a.frame > b.frame:
-		if a.frame > frame_current:
-			return a
-		elif b.frame > frame_current:
-			return b
-		return a
+	return next_shot
+
+
+def get_previous_shot(reference_frame, wrap_around=False):
+	previous_shot = get_adjecent_shot(reference_frame, "before", wrap_around)
+
+	return previous_shot
+
+
+def get_adjecent_shot(reference_frame, direction, wrap_around):
+	index = 0
+	slicing_function = lambda shot: shot.frame > reference_frame
 	
-	else:
-		if a.frame > frame_current:
-			return a
-		elif b.frame > frame_current:
-			return b
-		return a
+	if direction == "before":
+		index = -1
+		slicing_function = lambda shot: shot.frame < reference_frame
 	
-	return a
-
-
-def lower_frame_shot(a, b):
-	frame_current = bpy.context.scene.frame_current
-
-	if a.frame < b.frame:
-		if a.frame < frame_current:
-			return a
-		elif b.frame < frame_current:
-			return b
-		return a
+	shots = get_shots()
+	shots_before_or_after_reference = list(filter(slicing_function, shots))
 	
-	else:
-		if a.frame < frame_current:
-			return a
-		elif b.frame < frame_current:
-			return b
-		return a
+	if not shots_before_or_after_reference:
+		if wrap_around:
+			return sorted(shots, key=lambda shot: shot.frame)[index]
 		
-	return a
+		return None
+	
+	shots_before_or_after_reference_sorted = sorted(shots_before_or_after_reference, key=lambda shot: shot.frame)
+	
+	# Return first(0) shot from shots after playhead, or last(-1) shot of shots before the playhead
+	return shots_before_or_after_reference_sorted[index]
 
 
 # ----------------------------------------------------------------------------
@@ -118,9 +113,9 @@ def remove_all():
 
 def is_active_shot(shot):
 	scene = bpy.context.scene
+	frame_current = scene.frame_current
 
-	markers = scene.timeline_markers
-	sorted_shots = sorted(list(filter(lambda marker: marker.camera, markers)), key=lambda shot: shot.frame)
+	sorted_shots = sorted(get_shots(), key=lambda shot: shot.frame)
 	shots_frames = [shot.frame for shot in sorted_shots]
 
 	# Check if playhead is at any shot's frame
@@ -129,13 +124,14 @@ def is_active_shot(shot):
 		return shot.frame == scene.frame_current
 	
 	# Check if the shot to the left of the playhead is the active shot
-	previous_shot = reduce(lower_frame_shot, sorted(sorted_shots, key=lambda shot: shot.frame, reverse=True))
-	if shot == previous_shot and previous_shot.frame < scene.frame_current:
+	previous_shot = get_previous_shot(frame_current, wrap_around=True)
+	if shot == previous_shot and previous_shot.frame < frame_current:
 		return True
 	
 	# Check if the shot to the right of the playhead is the active shot
-	next_shot = reduce(higher_frame_shot, sorted(sorted_shots, key=lambda shot: shot.frame))
-	if shot == next_shot and previous_shot.frame > scene.frame_current:
+	next_shot = get_next_shot(frame_current, wrap_around=True)
+	
+	if shot == next_shot and previous_shot.frame > frame_current:
 		return True
 	
 	return False

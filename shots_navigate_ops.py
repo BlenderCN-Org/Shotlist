@@ -20,14 +20,14 @@ import bpy
 
 from . shotlist_api import (
 	get_shots,
-	higher_frame_shot, lower_frame_shot,
+	get_next_shot, get_previous_shot,
 	is_active_shot,
 )
 
 
 class ShotsNext(bpy.types.Operator):
 	"Go to next shot [Operator]"
-	bl_idname = "shotlist.shots_next"
+	bl_idname = "shotlist.goto_next_shot"
 	bl_label = "Go To Next Shot"
 	bl_description = "Go to next shot in your shotlist"
 	bl_options = {"UNDO"}
@@ -37,9 +37,8 @@ class ShotsNext(bpy.types.Operator):
 		return len(get_shots()) > 0
 	
 	def execute(self, context):
-		shots = get_shots()
-		next_shot = reduce(higher_frame_shot, sorted(shots, key=lambda shot: shot.frame))
-		
+		next_shot = get_next_shot(reference_frame=context.scene.frame_current, wrap_around=True)
+
 		context.scene.frame_current = next_shot.frame
 		
 		return {"FINISHED"}
@@ -47,7 +46,7 @@ class ShotsNext(bpy.types.Operator):
 
 class ShotsPrevious(bpy.types.Operator):
 	"""Go to previous shot [Operator]"""
-	bl_idname = "shotlist.shots_previous"
+	bl_idname = "shotlist.goto_previous_shot"
 	bl_label = "Go To Previous Shot"
 	bl_description = "Go to previous shot in your shotlist"
 	bl_options = {"UNDO"}
@@ -57,9 +56,7 @@ class ShotsPrevious(bpy.types.Operator):
 		return len(get_shots()) > 0
 	
 	def execute(self, context):
-		shots = get_shots()
-		
-		previous_shot = reduce(lower_frame_shot, sorted(shots, key=lambda shot: shot.frame, reverse=True))
+		previous_shot = get_previous_shot(reference_frame=context.scene.frame_current, wrap_around=True)
 		
 		context.scene.frame_current = previous_shot.frame
 		
