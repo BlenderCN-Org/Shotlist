@@ -28,6 +28,9 @@ class ShotsAdd(bpy.types.Operator):
 
 	@classmethod
 	def poll(cls, context):
+		if not context.object:
+			return False
+		
 		return context.object.type == "CAMERA"
 	
 	def execute(self, context):
