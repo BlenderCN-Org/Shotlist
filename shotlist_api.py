@@ -31,14 +31,22 @@ def get_shots():
 	return list(filter(lambda marker: marker.camera, scene.timeline_markers))
 
 
+def get_shot_at(frame):
+	for shot in get_shots():
+		if shot.frame == frame:
+			return shot
+	
+	return None
+
+
 def get_next_shot(reference_frame, wrap_around=False):
-	next_shot = get_adjecent_shot(reference_frame, "after", wrap_around)
+	next_shot = get_adjecent_shot(reference_frame, "right", wrap_around)
 
 	return next_shot
 
 
 def get_previous_shot(reference_frame, wrap_around=False):
-	previous_shot = get_adjecent_shot(reference_frame, "before", wrap_around)
+	previous_shot = get_adjecent_shot(reference_frame, "left", wrap_around)
 
 	return previous_shot
 
@@ -47,23 +55,23 @@ def get_adjecent_shot(reference_frame, direction, wrap_around):
 	index = 0
 	slicing_function = lambda shot: shot.frame > reference_frame
 	
-	if direction == "before":
+	if direction == "left":
 		index = -1
 		slicing_function = lambda shot: shot.frame < reference_frame
 	
 	shots = get_shots()
-	shots_before_or_after_reference = list(filter(slicing_function, shots))
+	shots_left_or_right_reference = list(filter(slicing_function, shots))
 	
-	if not shots_before_or_after_reference:
+	if not shots_left_or_right_reference:
 		if wrap_around:
 			return sorted(shots, key=lambda shot: shot.frame)[index]
 		
 		return None
 	
-	shots_before_or_after_reference_sorted = sorted(shots_before_or_after_reference, key=lambda shot: shot.frame)
+	shots_left_or_right_reference_sorted = sorted(shots_left_or_right_reference, key=lambda shot: shot.frame)
 	
 	# Return first(0) shot from shots after playhead, or last(-1) shot of shots before the playhead
-	return shots_before_or_after_reference_sorted[index]
+	return shots_left_or_right_reference_sorted[index]
 
 
 # ----------------------------------------------------------------------------
@@ -98,9 +106,9 @@ def add_shot():
 	return shot
 
 
-# def remove(shot):
-# 	bpy.context.scene.timeline_markers.remove(shot.marker)
-# 	shots.remove(shot)
+def remove_shot(shot):
+	bpy.context.scene.timeline_markers.remove(shot)
+
 
 def remove_all():
 	for marker in bpy.context.scene.timeline_markers:

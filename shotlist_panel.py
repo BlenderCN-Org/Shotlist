@@ -23,7 +23,7 @@ from . shotlist_api import (
 	is_active_shot,
 )
 from . shotlist_ops import (
-	ShotsAdd, ShotsRemoveAll,
+	ShotsAdd, ShotsRemoveShot, ShotsRemoveAll,
 	ShotsNext, ShotsPrevious, ShotsGoTo,
 	MarkersToggleLock,
 )
@@ -86,26 +86,28 @@ class ShotlistPanel(bpy.types.Panel):
 		if not get_shots():
 			return
 
-		header_row = shots_box.row().column(align=True)
+		header_col = shots_box.row().column(align=True)
 
-		header_grid = header_row.grid_flow(columns=4, even_columns=True, even_rows=False, align=True)
+		header_grid = header_col.grid_flow(columns=4, even_columns=False, even_rows=False, align=True)
 
 		for title in ("START", "SHOT", "CAMERA"):
 			header_grid.row().label(text=str(title))
 		
-		body_row = shots_box.row().column(align=True)
+		body_col = shots_box.row().column(align=True)
 
 		sorted_shots = sorted(get_shots(), key=lambda shot: shot.frame)
-
+		
+		# Redesign this layout. It's a little bit of a mess
 		for shot in sorted_shots:
-			body_grid = body_row.grid_flow(columns=4, even_columns=False, even_rows=False, align=True)
+			body_grid = body_col.grid_flow(columns=4, even_columns=False, even_rows=False, align=True)
 			
 			body_grid.box().operator(ShotsGoTo.bl_idname, text=f"{shot.frame}", emboss=True, depress=is_active_shot(shot)).frame = shot.frame
 			body_grid.box().prop(shot, "name", text="")
 			body_grid.box().label(text=shot.camera.name)
+			body_grid.box().operator(ShotsRemoveShot.bl_idname, text="", emboss=False, depress=False, icon="X").at_frame = shot.frame
 		
 		# Ideal would be to disable only the editable or destructive props, or at least leave the frame button clickable
-		body_row.enabled = False if scene.tool_settings.lock_markers else True
+		body_col.enabled = False if scene.tool_settings.lock_markers else True
 		
 		layout.separator()
 

@@ -16,19 +16,23 @@
 
 import bpy
 
-from . shots_add_op import ShotsAdd
-from . shots_remove_shot_op import ShotsRemoveShot
-from . shots_remove_all_op import ShotsRemoveAll
-from . shots_navigate_ops import ShotsNext, ShotsPrevious, ShotsGoTo
-from . markers_lock_toggle_op import MarkersToggleLock
+from . import shotlist_api
 
 
-OPERATORS = (
-	ShotsAdd,
-	ShotsRemoveShot,
-	ShotsRemoveAll,
-	ShotsNext,
-	ShotsPrevious,
-	ShotsGoTo,
-	MarkersToggleLock,
-)
+# Remove All Shots Operator
+class ShotsRemoveShot(bpy.types.Operator):
+	bl_idname = "shotlist.remove_shot"
+	bl_label = "Remove Specific Shot"
+	bl_description = "Remove Specific Shot"
+	bl_options = {"UNDO"}
+
+	at_frame: bpy.props.IntProperty()
+	
+	def execute(self, context):
+		shot = shotlist_api.get_shot_at(self.at_frame)
+		shot_name = shot.name
+
+		shotlist_api.remove_shot(shot)
+		
+		self.report({"INFO"}, f"Shot '{shot_name}' Removed")
+		return {"FINISHED"}
