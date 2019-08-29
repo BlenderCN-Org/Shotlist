@@ -34,6 +34,7 @@ import bpy
 
 
 from . shotlist_ops import OPERATORS
+from . shotlist_props import ShotlistProps
 from . shotlist_panel import ShotlistPanel
 
 
@@ -45,6 +46,10 @@ def register():
 	# Panel
 	bpy.utils.register_class(ShotlistPanel)
 
+	# Props
+	bpy.utils.register_class(ShotlistProps)
+	bpy.types.Scene.shotlist_props = bpy.props.PointerProperty(type=ShotlistProps)
+
 
 def unregister():
 	# Operators
@@ -54,6 +59,14 @@ def unregister():
 	# Panel
 	bpy.utils.unregister_class(ShotlistPanel)
 
+	# Props
+	bpy.utils.unregister_class(ShotlistProps)
+	if bpy.context.scene.get("shotlist_props"):
+		del bpy.context.scene["shotlist_props"]
+	try:
+		del bpy.types.Scene.shotlist_props
+	except:
+		pass
 
 if __name__ == "__main__":
 	register()

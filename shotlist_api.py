@@ -91,17 +91,16 @@ def add_shot():
 	if scene.frame_current in (shot.frame for shot in shots):
 		return
 	
-	shots_count = len(get_shots())
-	shot = scene.timeline_markers.new(name=f"Shot_{shots_count + 1}", frame=scene.frame_current)
-	shot.camera = context.object
-	# shot.framing = 'MS'
-	
-	# For ignore/replace functionality (to be implemented)
-	# matching_frame = list(filter(lambda shot: shot.frame == bpy.context.scene.frame_current, shots))
+	new_shot_name = context.scene.shotlist_props.new_shot_name
 
-	# if any(matching_frame):
-	# 	for shot in matching_frame:
-	# 		remove(shot)
+	if list(filter(lambda shot: shot.name == new_shot_name, get_shots())):
+		return
+	
+	shot_name = new_shot_name or f"Shot_{len(get_shots()) + 1}"
+	shot = scene.timeline_markers.new(name=shot_name, frame=scene.frame_current)
+	shot.camera = context.object
+
+	scene.shotlist_props.new_shot_name = ""
 
 	return shot
 

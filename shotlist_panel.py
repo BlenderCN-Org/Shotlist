@@ -53,16 +53,20 @@ class ShotlistPanel(bpy.types.Panel):
 		# Add New Shot Label
 		col.label(text="New Shot")
 
-		flow = col.grid_flow(columns=0, even_columns=False, even_rows=False, align=True)
+		flow = col.grid_flow(columns=3, even_columns=False, even_rows=False, align=False)
 		
 		obj = context.object
-		selected_info = obj.name if obj and obj.type == "CAMERA" else "No Camera Selected"
+		selected_object = obj.name if obj and obj.type == "CAMERA" else "No Camera Selected"
 		selected_icon = "OUTLINER_OB_CAMERA" if obj and obj.type == "CAMERA" else "RESTRICT_SELECT_ON"
 		
-		# Selected object Label
-		flow.box().label(text=selected_info, icon=selected_icon)
 		# Current Frame Label
-		flow.box().label(text=str(scene.frame_current), icon="TIME")
+		flow.column().label(text=str(scene.frame_current), icon="TIME")
+		# New Shot Name Field
+		new_shot_name = context.scene.shotlist_props.new_shot_name
+		new_shot_name_icon = "EVENT_S" if not list(filter(lambda shot: shot.name == new_shot_name, get_shots())) else "ERROR"
+		flow.column().prop(scene.shotlist_props, "new_shot_name", text="", icon=new_shot_name_icon)
+		# Selected object Label
+		flow.column().label(text=selected_object, icon=selected_icon)
 
 		# ShotsAdd Button
 		col.operator(ShotsAdd.bl_idname, text="Add Shot", icon="ADD")
@@ -88,17 +92,17 @@ class ShotlistPanel(bpy.types.Panel):
 		
 		if not get_shots():
 			return
-
-		flow = box.row().grid_flow(columns=4, even_columns=False, even_rows=False, align=True)
-
-		for title in ("START", "SHOT", "CAMERA", ""):
-			flow.label(text=str(title))
+		
+		grid_header = ("START", "SHOT", "CAMERA", "")
+		flow = box.row().grid_flow(columns=len(grid_header), even_columns=False, even_rows=False, align=True)
+		for title in grid_header:
+			flow.label(text=title)
 
 		sorted_shots = sorted(get_shots(), key=lambda shot: shot.frame)
 		
 		sub_box = box.box()
 		for shot in sorted_shots:
-			flow = sub_box.grid_flow(columns=4, even_columns=True, even_rows=True, align=True)
+			flow = sub_box.grid_flow(columns=len(grid_header), even_columns=True, even_rows=True, align=True)
 			
 			flow.operator(ShotsGoTo.bl_idname, text=f"{shot.frame}", emboss=True, depress=is_active_shot(shot)).frame = shot.frame
 			flow.prop(shot, "name", text="")

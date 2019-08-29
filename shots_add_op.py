@@ -41,6 +41,6 @@ class ShotsAdd(bpy.types.Operator):
 		
 		else:
 			# Temporary. Should be replaced with dialog asking whether to replace or to cancel
-			self.report({"WARNING"}, f"Shot Not Added. Remove Existing Shot First")
+			self.report({"WARNING"}, f"Shot Not Added. Remove or Rename Existing Shot First")
 		
 		return {"FINISHED"}
