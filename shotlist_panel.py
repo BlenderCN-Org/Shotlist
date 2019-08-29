@@ -17,10 +17,12 @@
 from functools import reduce
 
 import bpy
+from bpy.utils import time_from_frame
 
 from . shotlist_api import (
 	get_shots,
 	is_active_shot,
+	get_next_shot,
 )
 from . shotlist_ops import (
 	ShotsAdd, ShotsRemoveShot, ShotsRemoveAll,
@@ -93,7 +95,7 @@ class ShotlistPanel(bpy.types.Panel):
 		if not get_shots():
 			return
 		
-		grid_header = ("START", "SHOT", "CAMERA", "")
+		grid_header = ("START", "SHOT", "DURATION", "CAMERA", "")
 		flow = box.row().grid_flow(columns=len(grid_header), even_columns=False, even_rows=False, align=True)
 		for title in grid_header:
 			flow.label(text=title)
@@ -102,15 +104,23 @@ class ShotlistPanel(bpy.types.Panel):
 		
 		sub_box = box.box()
 		for shot in sorted_shots:
-			flow = sub_box.grid_flow(columns=len(grid_header), even_columns=True, even_rows=True, align=True)
+			flow = sub_box.grid_flow(columns=5, even_columns=True, even_rows=True, align=True)
 			
 			flow.operator(ShotsGoTo.bl_idname, text=f"{shot.frame}", emboss=True, depress=is_active_shot(shot)).frame = shot.frame
 			flow.prop(shot, "name", text="")
+
+			next_shot = get_next_shot(shot.frame)
+			shot_frames = next_shot.frame - shot.frame if next_shot else scene.frame_end - shot.frame
+			show_seconds = True
+			shot_duration_str = f"{int(time_from_frame(shot_frames).seconds)}s" if show_seconds else str(shot_frames)
+			flow.label(text=shot_duration_str)
+
 			flow.label(text=shot.camera.name)
+
 			flow.operator(ShotsRemoveShot.bl_idname, text="", emboss=False, depress=False, icon="CANCEL").at_frame = shot.frame
 		
 		# Ideal would be to disable only the editable or destructive props, or at least leave the frame button clickable
-		sub_box.enabled = False if scene.tool_settings.lock_markers else True
+		sub_box.enabled = True if not scene.tool_settings.lock_markers else False
 		
 		layout.separator()
 
