@@ -1,6 +1,5 @@
 # TODO:
-- Add "shot name" field to "new shot area"
-- Add "framing" and other fields
+- Add "framing", "duration"(option to show as seconds, as frames, or follow timeline("show seconds" toggle) and other fields
 - Add confirmation dialog to Remove All operator
 - Add dialog asking whether to replace the existing shot or not, when adding a shot at a frame that already has a shot
 - Merge shots navigate operators into one
