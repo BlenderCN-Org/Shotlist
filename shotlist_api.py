@@ -51,13 +51,10 @@ def get_previous_shot(reference_frame, wrap_around=False):
 	return previous_shot
 
 
-def get_adjecent_shot(reference_frame, direction, wrap_around):
-	index = 0
-	slicing_function = lambda shot: shot.frame > reference_frame
-	
-	if direction == "left":
-		index = -1
-		slicing_function = lambda shot: shot.frame < reference_frame
+def get_adjecent_shot(reference_frame, side="right", wrap_around=False):
+	index = 0 if side == "right" else -1
+	slicing_function = (lambda shot: shot.frame > reference_frame) if side == "right" \
+		else (lambda shot: shot.frame < reference_frame)
 	
 	shots = get_shots()
 	shots_left_or_right_reference = list(filter(slicing_function, shots))
