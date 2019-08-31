@@ -59,7 +59,7 @@ class ShotlistPanel(bpy.types.Panel):
 		
 		obj = context.object
 		selected_object = obj.name if obj and obj.type == "CAMERA" else "No Camera Selected"
-		selected_icon = "OUTLINER_OB_CAMERA" if obj and obj.type == "CAMERA" else "RESTRICT_SELECT_ON"
+		selected_icon = "VIEW_CAMERA" if obj and obj.type == "CAMERA" else "RESTRICT_SELECT_ON"
 		
 		# Current Frame Label
 		flow.column().label(text=str(scene.frame_current), icon="TIME")
@@ -109,7 +109,7 @@ class ShotlistPanel(bpy.types.Panel):
 			flow.operator(ShotsGoTo.bl_idname, text=f"{shot.frame}", emboss=True, depress=is_active_shot(shot)).frame = shot.frame
 			flow.prop(shot, "name", text="")
 
-			flow.label(text=shot.camera.name)
+			flow.prop(shot, "camera", text="", icon="DOT")
 
 			next_shot = get_next_shot(shot.frame)
 			shot_frames = next_shot.frame - shot.frame if next_shot else scene.frame_end - shot.frame
