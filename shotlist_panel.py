@@ -87,6 +87,9 @@ class ShotlistPanel(bpy.types.Panel):
 		lock_icon = "LOCKED" if scene.tool_settings.lock_markers else "UNLOCKED"
 		row.row().prop(context.scene.tool_settings, "lock_markers", icon=lock_icon, icon_only=True, emboss=False)
 		
+		box.row().prop(context.scene.shotlist_props, "show_camera_name")
+		box.row().prop(context.scene.shotlist_props, "hide_inactive_cameras")
+
 		# Next/Previous Shot Buttons
 		row = box.row(align=True)
 		row.operator(ShotsNext.bl_idname, text="Next Shot", icon="SORT_ASC")
