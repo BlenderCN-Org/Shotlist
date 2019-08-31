@@ -15,10 +15,22 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import bpy
+from bpy.props import StringProperty, BoolProperty
 
 
 class ShotlistProps(bpy.types.PropertyGroup):
-	new_shot_name: bpy.props.StringProperty(
+	new_shot_name: StringProperty(
 		name="New Shot Name",
 		description="The name of your new shot (e.g. 58A)",
+	)
+
+	show_camera_name: BoolProperty(
+		name="Show Camera Name",
+		description="Show active camera's name",
+		default=True,
+	)
+
+	hide_inactive_cameras: BoolProperty(
+		name="Hide Inactive Cameras",
+		description="Hide all but the active camera",
 	)
