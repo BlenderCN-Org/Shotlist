@@ -104,7 +104,7 @@ class ShotlistPanel(bpy.types.Panel):
 		
 		sub_box = box.box()
 		for shot in sorted_shots:
-			flow = sub_box.grid_flow(columns=5, even_columns=True, even_rows=True, align=True)
+			flow = sub_box.grid_flow(columns=len(grid_header), even_columns=True, even_rows=True, align=True)
 			
 			flow.operator(ShotsGoTo.bl_idname, text=f"{shot.frame}", emboss=True, depress=is_active_shot(shot)).frame = shot.frame
 			flow.prop(shot, "name", text="")
