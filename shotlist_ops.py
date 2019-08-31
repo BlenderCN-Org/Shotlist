@@ -24,11 +24,7 @@ from . markers_lock_toggle_op import MarkersToggleLock
 
 
 OPERATORS = (
-	ShotsAdd,
-	ShotsRemoveShot,
-	ShotsRemoveAll,
-	ShotsNext,
-	ShotsPrevious,
-	ShotsGoTo,
+	ShotsAdd, ShotsRemoveShot, ShotsRemoveAll,
+	ShotsNext, ShotsPrevious, ShotsGoTo,
 	MarkersToggleLock,
 )
