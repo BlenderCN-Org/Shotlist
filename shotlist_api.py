@@ -82,19 +82,19 @@ def add_shot():
 	"""
 	context = bpy.context
 	scene = context.scene
+	
+	new_shot_name_prop = context.scene.shotlist_props.new_shot_name
 
-	shots = get_shots()
-
-	if scene.frame_current in (shot.frame for shot in shots):
+	if list(filter(lambda shot: shot.name == new_shot_name_prop, get_shots())):
 		return
 	
-	new_shot_name = context.scene.shotlist_props.new_shot_name
+	new_shot_name = new_shot_name_prop or f"Shot_{len(get_shots()) + 1}"
 
-	if list(filter(lambda shot: shot.name == new_shot_name, get_shots())):
-		return
-	
-	shot_name = new_shot_name or f"Shot_{len(get_shots()) + 1}"
-	shot = scene.timeline_markers.new(name=shot_name, frame=scene.frame_current)
+	shot_at_playhead = get_shot_at(scene.frame_current)
+	if shot_at_playhead:
+		scene.timeline_markers.remove(shot_at_playhead)
+
+	shot = scene.timeline_markers.new(name=new_shot_name, frame=scene.frame_current)
 	shot.camera = context.object
 
 	scene.shotlist_props.new_shot_name = ""
