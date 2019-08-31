@@ -22,7 +22,7 @@ from bpy.utils import time_from_frame
 from . shotlist_api import (
 	get_shots,
 	is_active_shot,
-	get_next_shot,
+	get_shot_after,
 )
 from . shotlist_ops import (
 	ShotsAdd, ShotsRemoveShot, ShotsRemoveAll,
@@ -89,8 +89,8 @@ class ShotlistPanel(bpy.types.Panel):
 		
 		# Next/Previous Shot Buttons
 		row = box.row(align=True)
-		row.operator(ShotsPrevious.bl_idname, text="Previous Shot", icon="SORT_DESC")
 		row.operator(ShotsNext.bl_idname, text="Next Shot", icon="SORT_ASC")
+		row.operator(ShotsPrevious.bl_idname, text="Previous Shot", icon="SORT_DESC")
 		
 		if not get_shots():
 			return
@@ -111,7 +111,7 @@ class ShotlistPanel(bpy.types.Panel):
 
 			flow.prop(shot, "camera", text="", icon="DOT")
 
-			next_shot = get_next_shot(shot.frame)
+			next_shot = get_shot_after(shot.frame)
 			shot_frames = next_shot.frame - shot.frame if next_shot else scene.frame_end - shot.frame
 			show_seconds = True
 			shot_duration_str = f"{int(time_from_frame(shot_frames).seconds)}s" if show_seconds else str(shot_frames)
