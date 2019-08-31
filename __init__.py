@@ -36,6 +36,10 @@ import bpy
 from . shotlist_ops import OPERATORS
 from . shotlist_props import ShotlistProps
 from . shotlist_panel import ShotlistPanel
+from . shotlist_handlers import (
+	DEPSGRAPTH_UPDATE_PRE,
+	FRAME_CHANGE_PRE,
+)
 
 
 def register():
@@ -49,6 +53,13 @@ def register():
 	# Props
 	bpy.utils.register_class(ShotlistProps)
 	bpy.types.Scene.shotlist_props = bpy.props.PointerProperty(type=ShotlistProps)
+
+	# Handlers
+	for fn in DEPSGRAPTH_UPDATE_PRE:
+		bpy.app.handlers.depsgraph_update_pre.append(fn)
+	
+	for fn in FRAME_CHANGE_PRE:
+		bpy.app.handlers.frame_change_pre.append(fn)
 
 
 def unregister():
@@ -67,6 +78,14 @@ def unregister():
 		del bpy.types.Scene.shotlist_props
 	except:
 		pass
+	
+	# Handlers
+	for fn in DEPSGRAPTH_UPDATE_PRE:
+		bpy.app.handlers.depsgraph_update_pre.remove(fn)
+	
+	for fn in FRAME_CHANGE_PRE:
+		bpy.app.handlers.frame_change_pre.remove(fn)
+
 
 if __name__ == "__main__":
 	register()
