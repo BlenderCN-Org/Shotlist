@@ -39,13 +39,13 @@ def get_shot_at(frame):
 	return None
 
 
-def get_next_shot(reference_frame, wrap_around=False):
+def get_shot_after(reference_frame, wrap_around=False):
 	next_shot = get_adjecent_shot(reference_frame, "right", wrap_around)
 
 	return next_shot
 
 
-def get_previous_shot(reference_frame, wrap_around=False):
+def get_shot_before(reference_frame, wrap_around=False):
 	previous_shot = get_adjecent_shot(reference_frame, "left", wrap_around)
 
 	return previous_shot
@@ -128,12 +128,12 @@ def is_active_shot(shot):
 		return shot.frame == scene.frame_current
 	
 	# Check if the shot to the left of the playhead is the active shot
-	previous_shot = get_previous_shot(frame_current, wrap_around=True)
+	previous_shot = get_shot_before(frame_current, wrap_around=True)
 	if shot == previous_shot and previous_shot.frame < frame_current:
 		return True
 	
 	# Check if the shot to the right of the playhead is the active shot
-	next_shot = get_next_shot(frame_current, wrap_around=True)
+	next_shot = get_shot_after(frame_current, wrap_around=True)
 	
 	if shot == next_shot and previous_shot.frame > frame_current:
 		return True

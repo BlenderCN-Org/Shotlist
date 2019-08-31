@@ -20,7 +20,7 @@ import bpy
 
 from . shotlist_api import (
 	get_shots,
-	get_next_shot, get_previous_shot,
+	get_shot_after, get_shot_before,
 	is_active_shot,
 )
 
@@ -37,7 +37,7 @@ class ShotsNext(bpy.types.Operator):
 		return len(get_shots()) > 0
 	
 	def execute(self, context):
-		next_shot = get_next_shot(reference_frame=context.scene.frame_current, wrap_around=True)
+		next_shot = get_shot_after(reference_frame=context.scene.frame_current, wrap_around=True)
 
 		context.scene.frame_current = next_shot.frame
 		
@@ -56,7 +56,7 @@ class ShotsPrevious(bpy.types.Operator):
 		return len(get_shots()) > 0
 	
 	def execute(self, context):
-		previous_shot = get_previous_shot(reference_frame=context.scene.frame_current, wrap_around=True)
+		previous_shot = get_shot_before(reference_frame=context.scene.frame_current, wrap_around=True)
 		
 		context.scene.frame_current = previous_shot.frame
 		
