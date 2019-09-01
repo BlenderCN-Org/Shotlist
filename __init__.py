@@ -19,14 +19,13 @@ Blender Add-on to Set and Manage Camera Shots.
 """
 
 bl_info = {
-	"name": "Shotlist (Alpha)",
+	"name": "Shotlist",
 	"author": "Hyuri Pimentel",
 	"description": "Set and Manage Camera Shots",
 	"blender": (2, 81, 0),
 	"version": (1, 0, 0),
 	"location": "View3D > Properties > Shotlist",
 	"support": "COMMUNITY",
-	"warning": "",
 	"category": "3D View"
 }
 
