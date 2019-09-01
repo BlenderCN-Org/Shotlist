@@ -1,3 +1,10 @@
+![Shotlist_v0 0 3_Screenshot](https://user-images.githubusercontent.com/18584014/64071810-b3f6e000-cc58-11e9-9f31-b485a496957c.png)
+
+# Shotlist | Shot Manager for Blender 2.8
+### Quickly Create, Change, Remove, and Navigate Through Your Shots.
+#### Leaves your regular markers untouched.
+Originally developed for my own use—when the process of switching between cameras was a little more convoluted, in Blender—but updated and upgraded(read: made more useful) for 2.8.
+
 # TODO:
 - Add "framing", and other fields
 - Add settings popover menu
